@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends CanvasLayer
 ## On-screen print utility
 ##
 ## Allows printing temporary text strings on screen.
@@ -15,14 +15,19 @@ const CORNER_OFFSET := Vector2(100, 50)
 const DURATION := 3
 
 
+var _vbox: VBoxContainer = null
 var _labels: Array[Label] = []
 var _tweens: Array[Tween] = []
 var _idx := 0
 
 
 func _ready() -> void:
-	offset_top = CORNER_OFFSET.x
-	offset_left = CORNER_OFFSET.y
+	layer = 99
+
+	_vbox = VBoxContainer.new()
+	_vbox.offset_top = CORNER_OFFSET.x
+	_vbox.offset_left = CORNER_OFFSET.y
+	add_child(_vbox)
 
 	var label_settings := LabelSettings.new()
 	label_settings.font_color = Color.WHITE
@@ -33,7 +38,7 @@ func _ready() -> void:
 		var label := Label.new()
 		label.modulate.a = 0
 		label.label_settings = label_settings
-		add_child(label)
+		_vbox.add_child(label)
 		_labels.append(label)
 		var tween := create_tween()
 		tween.kill()
@@ -51,7 +56,7 @@ func animate_label(label: Label, tween: Tween) -> void:
 func print_to_screen(text: String) -> void:
 	var label := _labels[_idx]
 	var tween := _tweens[_idx]
-	move_child(label, 0)
+	_vbox.move_child(label, 0)
 	tween.kill()
 	label.text = text
 	label.modulate = Color(1, 1, 1, 1)
